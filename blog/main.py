@@ -33,9 +33,9 @@ def get_db():
         db.close()
 
 
-@app.post('/blog', status_code=status.HTTP_201_CREATED)
+@app.post('/blog', status_code=status.HTTP_201_CREATED, tags=['blogs'])
 def create_new_blog(request: schemas.Blog, db: Session = Depends(get_db)):
-    new_blog = models.Blog(title=request.title, body=request.body)
+    new_blog = models.Blog(title=request.title, body=request.body, user_id=1)
 
     db.add(new_blog)
     db.commit()
@@ -43,7 +43,9 @@ def create_new_blog(request: schemas.Blog, db: Session = Depends(get_db)):
     return new_blog
 
 
-@app.delete('/blog/{id}', status_code=status.HTTP_204_NO_CONTENT)
+@app.delete('/blog/{id}',
+            status_code=status.HTTP_204_NO_CONTENT,
+            tags=['blogs'])
 def delete_blog(id: int, db: Session = Depends(get_db)):
     blog = db.query(models.Blog).filter(models.Blog.id == id)
     if not blog:
@@ -54,7 +56,7 @@ def delete_blog(id: int, db: Session = Depends(get_db)):
     return {'data': f'Blog with id {id} deleted'}
 
 
-@app.put('/blog/{id}', status_code=status.HTTP_202_ACCEPTED)
+@app.put('/blog/{id}', status_code=status.HTTP_202_ACCEPTED, tags=['blogs'])
 def update_blog(id: int, request: schemas.Blog, db: Session = Depends(get_db)):
     blog = db.query(models.Blog).filter(models.Blog.id == id)
     if not blog:
@@ -65,7 +67,7 @@ def update_blog(id: int, request: schemas.Blog, db: Session = Depends(get_db)):
     return {'data': f'Blog with id {id} updated'}
 
 
-@app.get('/blog', response_model=List[schemas.ShowBlog])
+@app.get('/blog', response_model=List[schemas.ShowBlog], tags=['blogs'])
 def get_all_blogs(db: Session = Depends(get_db)):
     blogs = db.query(models.Blog).all()
     return blogs
@@ -73,7 +75,8 @@ def get_all_blogs(db: Session = Depends(get_db)):
 
 @app.get('/blog/{id}',
          status_code=status.HTTP_200_OK,
-         response_model=schemas.ShowBlog)
+         response_model=schemas.ShowBlog,
+         tags=['blogs'])
 def get_blog(id: int, response: Response, db: Session = Depends(get_db)):
     blog = db.query(models.Blog).filter(models.Blog.id == id).first()
     if not blog:
@@ -84,7 +87,8 @@ def get_blog(id: int, response: Response, db: Session = Depends(get_db)):
 
 @app.post('/user',
           status_code=status.HTTP_201_CREATED,
-          response_model=schemas.ShowUser)
+          response_model=schemas.ShowUser,
+          tags=['users'])
 def create_user(request: schemas.User, db: Session = Depends(get_db)):
     new_user = models.User(name=request.name,
                            email=request.email,
@@ -98,7 +102,8 @@ def create_user(request: schemas.User, db: Session = Depends(get_db)):
 
 @app.get('/user/{id}',
          status_code=status.HTTP_200_OK,
-         response_model=schemas.ShowUser)
+         response_model=schemas.ShowUserContent,
+         tags=['users'])
 def get_user(id: int, response: Response, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.id == id).first()
     if not user:
