@@ -27,17 +27,17 @@ def show(id: int, db: Session):
 
 def update(id: int, request: schemas.Blog, db: Session):
     blog = db.query(models.Blog).filter(models.Blog.id == id)
-    if not blog:
+    if not blog.first():
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f'Blog with id {id} not found')
-    blog.update(request, synchronize_session=False)
+    blog.update(request.dict())
     db.commit()
     return {'data': f'Blog with id {id} updated'}
 
 
 def delete(id: int, db: Session):
     blog = db.query(models.Blog).filter(models.Blog.id == id)
-    if not blog:
+    if not blog.first():
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f'Blog with id {id} not found')
     blog.delete(synchronize_session=False)

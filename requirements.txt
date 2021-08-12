@@ -6,3 +6,4 @@ SQLAlchemy
 passlib[bcrypt]
 python-jose[cryptography]
 datetime
+python-multipart
